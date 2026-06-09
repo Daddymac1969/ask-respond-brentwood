@@ -1,7 +1,7 @@
 {
-  "name": "ask-respond-medical",
-  "version": "1.0.0",
-  "description": "Ask RESPOND Medical — AI-powered boarding medical guidance for houseparents at TASIS England",
+  "name": "ask-respond-brentwood",
+  "version": "1.1.0",
+  "description": "Ask RESPOND Brentwood — AI safeguarding thinking partner for staff at Brentwood Community College",
   "private": true,
   "engines": {
     "node": ">=18.0.0"
@@ -11,17 +11,19 @@
     "build": "echo 'No build step required — static HTML'",
     "deploy": "netlify deploy --prod"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.65.0"
+  },
   "devDependencies": {
     "netlify-cli": "^17.0.0"
   },
   "keywords": [
     "safeguarding",
-    "boarding",
-    "medical",
+    "specialist-fe",
+    "sld-pmld",
     "respond-framework",
-    "tasis"
+    "brentwood"
   ],
-  "author": "RESPOND Safeguarding · TASIS England",
+  "author": "RESPOND Safeguarding",
   "license": "UNLICENSED"
 }
