@@ -1,0 +1,27 @@
+{
+  "name": "ask-respond-medical",
+  "version": "1.0.0",
+  "description": "Ask RESPOND Medical — AI-powered boarding medical guidance for houseparents at TASIS England",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build step required — static HTML'",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  },
+  "keywords": [
+    "safeguarding",
+    "boarding",
+    "medical",
+    "respond-framework",
+    "tasis"
+  ],
+  "author": "RESPOND Safeguarding · TASIS England",
+  "license": "UNLICENSED"
+}
