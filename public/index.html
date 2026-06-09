@@ -21,6 +21,7 @@
       --acc-hi:  #3fc7a6;
       --leaf:    #79bd70;
       --trunk:   #494947;
+      --trunk-soft: #5f5f5d;
       --border:  rgba(255,255,255,0.14);
       --glass:   rgba(255,255,255,0.08);
       --muted:   rgba(255,255,255,0.62);
@@ -359,7 +360,7 @@
     .a11y-section h4 {
       margin: 0 0 1rem 0;
       font-size: 0.85rem;
-      color: #6b7280;
+      color: var(--trunk-soft);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       display: flex;
@@ -452,7 +453,7 @@
       gap: 0.75rem;
       padding: 0.5rem 0;
       font-size: 0.9rem;
-      color: #6b7280;
+      color: var(--trunk-soft);
     }
     .shortcut kbd {
       display: inline-flex;
@@ -484,7 +485,7 @@
       background: white;
       border-radius: 10px;
       font-size: 0.9rem;
-      color: #6b7280;
+      color: var(--trunk-soft);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -546,7 +547,7 @@
       border: none;
       background: #f3f4f6;
       border-radius: 10px;
-      color: #6b7280;
+      color: var(--trunk-soft);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -559,7 +560,7 @@
     }
     .contact-intro {
       font-size: 0.9rem;
-      color: #6b7280;
+      color: var(--trunk-soft);
       margin-bottom: 1.25rem;
       line-height: 1.5;
     }
@@ -620,7 +621,7 @@
       background: #f9fafb;
       border-radius: 0 0 20px 20px;
       font-size: 0.8rem;
-      color: #6b7280;
+      color: var(--trunk-soft);
       text-align: center;
     }
     .contact-footer a {
@@ -641,7 +642,7 @@
       margin-bottom: 0.5rem;
     }
     .form-success p {
-      color: #6b7280;
+      color: var(--trunk-soft);
       font-size: 0.95rem;
     }
     .contact-btn {
@@ -673,7 +674,7 @@
       background: #f9fafb;
       border-radius: 8px;
       font-size: 0.8rem;
-      color: #6b7280;
+      color: var(--trunk-soft);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -799,7 +800,7 @@
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: #6b7280;
+      color: var(--trunk-soft);
       margin: 0 0 0.75rem;
       display: flex; align-items: center; gap: 0.4rem;
     }
@@ -826,7 +827,7 @@
     .icon-purple { background: #ede9fe; color: #7c3aed; }
     .emerg-contact-info { flex: 1; min-width: 0; }
     .emerg-contact-name { font-weight: 600; font-size: 0.87rem; color: #111; }
-    .emerg-contact-role { font-size: 0.75rem; color: #6b7280; margin-bottom: 0.3rem; }
+    .emerg-contact-role { font-size: 0.75rem; color: var(--trunk-soft); margin-bottom: 0.3rem; }
     .emerg-contact-nums { display: flex; flex-direction: column; gap: 0.2rem; }
     .emerg-num {
       display: inline-flex; align-items: center; gap: 0.35rem;
@@ -834,7 +835,7 @@
       text-decoration: none;
     }
     .emerg-num:hover { text-decoration: underline; }
-    .emerg-num i { font-size: 0.72rem; color: #6b7280; }
+    .emerg-num i { font-size: 0.72rem; color: var(--trunk-soft); }
     .emerg-big {
       display: flex; align-items: center; gap: 0.75rem;
       background: #fef2f2; border: 1px solid #fecaca;
@@ -905,7 +906,7 @@
         
         <div class="login-disclaimer">
           <p><i class="fa-solid fa-triangle-exclamation"></i> <strong>Emergency?</strong> Call <strong>999</strong> immediately. Do not consult this tool first in a life-threatening situation.</p>
-          <p><i class="fa-solid fa-circle-info"></i> This tool provides structured medical guidance only. It does not replace clinical judgement, school nurse assessment, or your DSL. Do not input identifying information about students.</p>
+          <p><i class="fa-solid fa-circle-info"></i> This tool provides structured safeguarding and behaviour guidance only. It does not replace your professional judgement or the DSL. It does not make safeguarding decisions. Do not input identifying information about students — use initials or "Student A".</p>
           <label class="checkbox-label">
             <input type="checkbox" id="disclaimerCheck">
             <span>I understand this is guidance only and will apply clinical and safeguarding judgement at all times</span>
@@ -2436,7 +2437,7 @@
             }
             #print-container .school-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; }
             #print-container .school-logo-area { display: flex; align-items: center; }
-            #print-container .school-name { font-size: 0.75rem; color: #666; text-align: right; }
+            #print-container .school-name { font-size: 0.75rem; color: var(--trunk); text-align: right; }
             #print-container .school-name strong { display: block; color: var(--p-base); font-size: 0.85rem; }
             #print-container .header { border-bottom: 3px solid var(--p-base); padding-bottom: 0.75rem; margin-bottom: 1rem; }
             #print-container .header-brand { display: flex; align-items: center; gap: 0.75rem; }
@@ -2450,7 +2451,7 @@
             #print-container .dot-n { background: #287bc9 !important; }
             #print-container .dot-d { background: #8625eb !important; }
             #print-container .header h1 { color: var(--p-base); margin: 0; font-size: 1.4rem; font-weight: 600; }
-            #print-container .header-meta { color: #666; margin: 0.5rem 0 0; font-size: 0.8rem; }
+            #print-container .header-meta { color: var(--trunk); margin: 0.5rem 0 0; font-size: 0.8rem; }
             #print-container .qa-pair { margin-bottom: 1rem; }
             #print-container .message { margin-bottom: 0.4rem; }
             #print-container .message-label { font-weight: 600; color: var(--p-base); margin-bottom: 0.2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -2469,7 +2470,7 @@
             #print-container .priority-blue { background: #dbeafe !important; color: var(--p-dark); border-left: 4px solid #3b82f6; }
             #print-container h4 { color: var(--p-base); font-size: 0.95rem; font-weight: 700; margin: 1rem 0 0.4rem 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.2rem; }
             #print-container h4:first-child { margin-top: 0; }
-            #print-container .footer { margin-top: 2rem; padding-top: 1rem; border-top: 2px solid var(--p-base); font-size: 0.7rem; color: #666; }
+            #print-container .footer { margin-top: 2rem; padding-top: 1rem; border-top: 2px solid var(--p-base); font-size: 0.7rem; color: var(--trunk); }
             #print-container .footer-warning { background: #fef3c7 !important; border-left: 4px solid #f59e0b; padding: 0.6rem 0.9rem; margin-bottom: 0.75rem; border-radius: 0 4px 4px 0; }
             #print-container .confidential { background: #fef2f2 !important; border: 1px solid #fecaca; border-radius: 4px; padding: 0.5rem 0.75rem; margin-top: 1rem; font-size: 0.7rem; color: #991b1b; text-align: center; font-weight: 500; }
           }
@@ -2521,7 +2522,7 @@
           /* School logo area */
           .school-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; }
           .school-logo-area { display: flex; align-items: center; }
-          .school-name { font-size: 0.75rem; color: #666; text-align: right; }
+          .school-name { font-size: 0.75rem; color: var(--trunk); text-align: right; }
           .school-name strong { display: block; color: var(--p-base); font-size: 0.85rem; }
           
           /* Main header */
@@ -2537,7 +2538,7 @@
           .dot-n { background: #287bc9 !important; }
           .dot-d { background: #8625eb !important; }
           .header h1 { color: var(--p-base); margin: 0; font-size: 1.4rem; font-weight: 600; }
-          .header-meta { color: #666; margin: 0.5rem 0 0; font-size: 0.8rem; }
+          .header-meta { color: var(--trunk); margin: 0.5rem 0 0; font-size: 0.8rem; }
           
           /* Messages */
           .conversation { }
@@ -2571,7 +2572,7 @@
           li { margin-bottom: 0.4rem; }
           
           /* Footer */
-          .footer { margin-top: 2rem; padding-top: 1rem; border-top: 2px solid var(--p-base); font-size: 0.7rem; color: #666; }
+          .footer { margin-top: 2rem; padding-top: 1rem; border-top: 2px solid var(--p-base); font-size: 0.7rem; color: var(--trunk); }
           .footer-warning { background: #fef3c7 !important; border-left: 4px solid #f59e0b; padding: 0.6rem 0.9rem; margin-bottom: 0.75rem; border-radius: 0 4px 4px 0; font-size: 0.75rem; }
           .footer-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; }
           
