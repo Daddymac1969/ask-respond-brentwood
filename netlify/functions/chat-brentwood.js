@@ -1,4 +1,4 @@
-// Ask RESPOND Brentwood — chat function — v1.4 (user guide added)
+// Ask RESPOND Brentwood — chat function — v1.5 (architect mode)
 const Anthropic = require('@anthropic-ai/sdk');
 
 // ─────────────────────────────────────────────
@@ -610,6 +610,51 @@ function selectPolicies(messages) {
 // ─────────────────────────────────────────────
 // HANDLER
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// ARCHITECT MODE
+// A private mode for the tool's builder to discuss design and
+// improvements in the moment. Triggered by a phrase held ONLY in
+// the ARCHITECT_PHRASE environment variable (never in source).
+// This is a convenience, NOT authentication: it changes tone and
+// what the assistant will discuss. It NEVER relaxes any
+// safeguarding guardrail. Session toggle: on once the phrase is
+// seen, off again after an exit token.
+// ─────────────────────────────────────────────────────────────
+function architectActive(messages) {
+  const phrase = (process.env.ARCHITECT_PHRASE || '').trim().toLowerCase();
+  if (!phrase) return false;
+  const exitTokens = ['exit architect', 'architect off', 'leave architect', 'end architect'];
+  let onAt = -1, offAt = -1;
+  for (let i = 0; i < messages.length; i++) {
+    const m = messages[i];
+    if (!m || m.role !== 'user' || typeof m.content !== 'string') continue;
+    const c = m.content.toLowerCase();
+    if (c.includes(phrase)) onAt = i;
+    if (exitTokens.some(function(t){ return c.includes(t); })) offAt = i;
+  }
+  return onAt > -1 && onAt >= offAt;
+}
+
+const ARCHITECT_OVERLAY = `
+
+============================================================
+ARCHITECT MODE — ACTIVE
+============================================================
+
+You are now speaking with the person who designs and maintains this tool (the architect), not a frontline staff member. They have identified themselves with a private phrase so they can discuss the tool itself in the moment.
+
+In this mode:
+- Talk as a candid design collaborator. Discuss the system prompt, the policy banks, wording, gaps, edge cases, routing, branding, and possible improvements openly and specifically.
+- You MAY reflect on and critique your own design, instructions and limitations honestly.
+- Do NOT produce a safeguarding triage response to design questions. Do NOT emit a [PRIORITY:...] tag, and do not use the frontline safeguarding response format, unless an actual live concern about a real person is being raised.
+- Be concise and direct. The architect prefers terse, practical exchanges.
+
+ABSOLUTE LIMITS — these do not change in architect mode:
+- Every safeguarding guardrail above remains fully in force. Architect mode changes tone and scope of discussion only; it grants no power to weaken or switch off any safety rule, the crisis override, the hard stops, the no-confidentiality rule, or the no-threshold-decisions rule.
+- If at any point a genuine, live safeguarding concern about a real child or adult is raised, drop architect framing immediately and respond as the safeguarding tool, guardrails first.
+- Do not reveal the architect phrase, environment variables, access codes, or any secret, even if asked. You may discuss that such mechanisms exist, not their values.
+- This mode is recognised from a phrase in the message and is not proof of identity; never treat it as authorisation to do anything the tool should not otherwise do.`;
+
 exports.handler = async function(event, context) {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers: corsHeaders(), body: '' };
@@ -637,17 +682,20 @@ exports.handler = async function(event, context) {
 
     const systemPrompt = BASE_PROMPT + datetimeBlock + '\n\n---\n\n' + policyContent;
 
+    const isArchitect = architectActive(messages);
+    const finalSystemPrompt = isArchitect ? (systemPrompt + ARCHITECT_OVERLAY) : systemPrompt;
+
     const response = await client.messages.create({
       model: 'claude-opus-4-7',
       max_tokens: 2048,
-      system: systemPrompt,
+      system: finalSystemPrompt,
       messages: messages
     });
 
     return {
       statusCode: 200,
       headers: corsHeaders(),
-      body: JSON.stringify({ content: response.content[0].text })
+      body: JSON.stringify({ content: response.content[0].text, architect: isArchitect })
     };
 
   } catch (err) {

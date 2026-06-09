@@ -73,6 +73,7 @@
     .chat-container.show { display: flex; }
     
     .header { background: rgba(10,61,48,0.95); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .architect-badge { margin-left: 0.7rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: #0a3d30; background: var(--acc-hi); padding: 0.2rem 0.55rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.3rem; }
     .logo { display: flex; align-items: center; gap: 0.75rem; color: white; }
     .logo-icon { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
     .logo-icon svg { width: 24px; height: 24px; fill: white; }
@@ -942,6 +943,7 @@
         <div class="dot dot-d"></div>
       </div>
       <span class="logo-text">Ask <span style="font-weight:400;opacity:0.8">RESPOND</span></span>
+      <span id="architectBadge" class="architect-badge" style="display:none;"><i class="fa-solid fa-screwdriver-wrench"></i> Architect mode</span>
     </div>
     <div class="header-actions">
       <a href="Ask_RESPOND_User_Guide.html" target="_blank" class="icon-btn" title="User Guide" aria-label="Open user guide">
@@ -1538,6 +1540,7 @@
     messages.appendChild(welcome);
     welcome.style.display = 'block';
     clearBtn.classList.remove('show');
+    setArchitectMode(false);
   }
 
   async function sendMessage() {
@@ -1623,6 +1626,7 @@
         } else {
           addMessage('bot', data.content);
           history.push({ role: 'assistant', content: data.content });
+          setArchitectMode(!!data.architect);
         }
       }
     } catch (err) {
@@ -1724,6 +1728,11 @@
     questionInput.style.height = Math.min(questionInput.scrollHeight, 300) + 'px';
     sendMessage();
   };
+
+  function setArchitectMode(on) {
+    const badge = document.getElementById('architectBadge');
+    if (badge) badge.style.display = on ? 'inline-flex' : 'none';
+  }
 
   function addMessage(role, content, loading = false, error = false) {
     const div = document.createElement('div');
