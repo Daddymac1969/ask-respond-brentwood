@@ -670,7 +670,7 @@ function normaliseMessages(input) {
   const merged = [];
   for (const m of recent) {
     if (merged.length && merged.at(-1).role === m.role) {
-      const content = merged.at(-1).content + "\\n" + m.content;
+      const content = merged.at(-1).content + "\n" + m.content;
       if (content.length > 6000) throw Error("Combined message too long");
       merged.at(-1).content = content;
     } else merged.push({ ...m });
