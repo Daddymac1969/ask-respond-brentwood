@@ -1,59 +1,37 @@
-// Netlify serverless function — Authentication
-// Ask RESPOND Medical | TASIS England
-// Version: 1.2
-
+"use strict";
+// Ask RESPOND Brentwood: server-side access-code verification.
+// A successful login issues a short-lived signed token. No auth state is trusted from the browser.
+const crypto = require("node:crypto");
+const { issueSession, getSecret, TTL_SECONDS } = require("../shared/brentwood-session");
+const HEADERS = {
+  "Content-Type": "application/json",
+  "Cache-Control": "no-store",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization"
+};
+function reply(statusCode, data) {
+  return { statusCode, headers: HEADERS, body: JSON.stringify(data) };
+}
 exports.handler = async (event) => {
-  const corsHeaders = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  };
-
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 204, headers: corsHeaders, body: '' };
+  if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers: HEADERS, body: "" };
+  if (event.httpMethod !== "POST") return reply(405, { success: false, error: "Method not allowed" });
+  if (!getSecret() || !process.env.BRENTWOOD_ACCESS_CODE) {
+    return reply(503, { success: false, configError: true, error: "Guidance service is not configured. Contact your administrator." });
   }
-
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers: corsHeaders, body: JSON.stringify({ success: false, error: 'Method not allowed' }) };
+  let body;
+  try { body = JSON.parse(event.body || "{}"); }
+  catch (_) { return reply(400, { success: false, error: "Invalid request" }); }
+  if (!body || typeof body.password !== "string" || !body.password.trim() || body.password.length > 512) {
+    return reply(400, { success: false, error: "Access code required" });
   }
-
   try {
-    let body = {};
-    try { body = JSON.parse(event.body || '{}'); } catch (_) {}
-
-    const { password } = body;
-
-    if (!password) {
-      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ success: false, error: 'Password required' }) };
-    }
-
-    const validPassword = process.env.BRENTWOOD_ACCESS_CODE;
-
-    // If env var not set, log clearly and return config error (not wrong password)
-    if (!validPassword) {
-      console.error('BRENTWOOD_ACCESS_CODE environment variable is not set in Netlify.');
-      return {
-        statusCode: 500,
-        headers: corsHeaders,
-        body: JSON.stringify({ success: false, configError: true, error: 'Access code not configured on server. Contact your administrator.' }),
-      };
-    }
-
-    const isValid = password.trim() === validPassword.trim();
-
-    return {
-      statusCode: 200,
-      headers: { ...corsHeaders, 'Cache-Control': 'no-store' },
-      body: JSON.stringify({ success: isValid }),
-    };
-
-  } catch (error) {
-    console.error('Auth error:', error.message);
-    return {
-      statusCode: 500,
-      headers: corsHeaders,
-      body: JSON.stringify({ success: false, configError: true, error: 'Server error: ' + error.message }),
-    };
+    const actual = crypto.createHash("sha256").update(body.password.trim()).digest();
+    const expected = crypto.createHash("sha256").update(process.env.BRENTWOOD_ACCESS_CODE.trim()).digest();
+    if (!crypto.timingSafeEqual(actual, expected)) return reply(200, { success: false });
+    const token = issueSession();
+    if (!token) return reply(503, { success: false, error: "Guidance service unavailable" });
+    return reply(200, { success: true, token, expiresIn: TTL_SECONDS });
+  } catch (_) {
+    return reply(503, { success: false, error: "Guidance service unavailable" });
   }
 };
