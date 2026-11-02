@@ -1378,40 +1378,35 @@
   const hideScreen = document.getElementById('hideScreen');
   const exampleGrid = document.getElementById('exampleGrid');
 
-  // Check saved auth and timeout
-  const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
-  const lastActivity = localStorage.getItem('respond-bcc-activity');
-  const now = Date.now();
-  
-  if (localStorage.getItem('respond-bcc-auth') === 'true') {
-    if (lastActivity && (now - parseInt(lastActivity)) > SESSION_TIMEOUT) {
-      // Session expired
-      localStorage.removeItem('respond-bcc-auth');
-      localStorage.removeItem('respond-bcc-activity');
-    } else {
-      loginScreen.style.display = 'none';
-      chatContainer.classList.add('show');
-      updateActivity();
-    }
-  }
-  
+  // Only the server-signed bearer grants access. No persistent browser auth flags.
+  const SESSION_TIMEOUT = 30 * 60 * 1000;
+  let brentwoodSessionToken = null;
+  let brentwoodSessionStarted = 0;
+  let brentwoodLastActivity = 0;
+  // Invalidate historical browser-only access flags from earlier releases.
+  try {
+    localStorage.removeItem('respond-bcc-auth');
+    localStorage.removeItem('respond-bcc-activity');
+  } catch (_) { /* Storage may be disabled; it is never used to authorise access. */ }
+
   function updateActivity() {
-    localStorage.setItem('respond-bcc-activity', Date.now().toString());
+    if (brentwoodSessionToken) brentwoodLastActivity = Date.now();
   }
-  
-  // Track activity
   document.addEventListener('click', updateActivity);
   document.addEventListener('keydown', updateActivity);
-  
-  // Check for timeout periodically
+
+  function expiredSession() {
+    return !brentwoodSessionToken || Date.now() - brentwoodSessionStarted >= SESSION_TIMEOUT ||
+      Date.now() - brentwoodLastActivity >= SESSION_TIMEOUT;
+  }
+  // Server tokens have a hard 30-minute lifetime; activity does not extend it.
   setInterval(() => {
-    const lastAct = localStorage.getItem('respond-bcc-activity');
-    if (lastAct && (Date.now() - parseInt(lastAct)) > SESSION_TIMEOUT) {
-      localStorage.removeItem('respond-bcc-auth');
-      localStorage.removeItem('respond-bcc-activity');
+    if (brentwoodSessionToken && expiredSession()) {
+      brentwoodSessionToken = null;
+      history = [];
       location.reload();
     }
-  }, 60000); // Check every minute
+  }, 60000);
 
   // Enable/disable login button based on checkbox
   disclaimerCheck.addEventListener('change', () => {
@@ -1441,9 +1436,11 @@
       
       const data = await response.json();
       
-      if (data.success) {
-        localStorage.setItem('respond-bcc-auth', 'true');
-        localStorage.setItem('respond-bcc-activity', Date.now().toString());
+      if (response.ok && data.success && typeof data.token === 'string') {
+        brentwoodSessionToken = data.token;
+        brentwoodSessionStarted = Date.now();
+        updateActivity();
+        passwordInput.value = '';
         loginScreen.style.display = 'none';
         chatContainer.classList.add('show');
       } else {
@@ -1546,7 +1543,12 @@
   async function sendMessage() {
     const question = questionInput.value.trim();
     if (!question || isLoading) return;
-
+    if (expiredSession()) {
+      brentwoodSessionToken = null;
+      history = [];
+      location.reload();
+      return;
+    }
     isLoading = true;
     sendBtn.disabled = true;
     questionInput.value = '';
@@ -1564,9 +1566,15 @@
     try {
       const response = await fetch('/.netlify/functions/chat-brentwood', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + brentwoodSessionToken },
         body: JSON.stringify({ messages: history, clientDatetime: new Date().toISOString() })
       });
+      if (response.status === 401) {
+        brentwoodSessionToken = null;
+        history = [];
+        location.reload();
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(`Server error: ${response.status}`);
